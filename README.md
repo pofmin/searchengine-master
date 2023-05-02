@@ -13,7 +13,7 @@
 - HTML  
 - CSS  
 - JAVASCRIPT  
-- JQUERY  
+- JQUERY
 <br/><br/>
 
 ## Инструкция по запуску и использованию приложения
