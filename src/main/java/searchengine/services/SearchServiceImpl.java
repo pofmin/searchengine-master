@@ -36,7 +36,6 @@ public class SearchServiceImpl implements SearchService {
     private List<SearchData> searchDataList = new ArrayList<>();
     private List<PageEntity> allPages = new ArrayList<>();
     private List<String> queryLemmas = new ArrayList<>();
-    private String previousQuery;
     private int previousOffset;
 
     @Value("${indexing-settings.snippet-length-max}")
@@ -59,7 +58,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public SearchResponse getSearchResults(SearchRequestParams searchRequestParams) throws IOException, InterruptedException {
-        if (!searchRequestParams.getQuery().equals(previousQuery) && searchRequestParams.getOffset() == 0) {
+        if (searchRequestParams.getOffset() == 0) {
             previousOffset = 0;
             if (sitesList.getSites().size() == 0) {
                 throw new NoSitesInConfigException();
@@ -83,7 +82,6 @@ public class SearchServiceImpl implements SearchService {
             setRelevance(getBiggestAbsoluteRelevance());
         }
         getSearchDataList(searchRequestParams.getOffset(), searchRequestParams.getLimit());
-        previousQuery = searchRequestParams.getQuery();
         return new SearchResponse(allPages.size(), searchDataList);
     }
 
