@@ -61,6 +61,7 @@ public class IndexingServiceImpl implements IndexingService {
         }
         onePageIndexes.clear();
         List<Thread> threads = new ArrayList<>();
+
         for (Site site : sitesList.getSites()) {
             isRunning.put(site.getName(), true);
             SiteScanner siteScanner = new SiteScanner(site);
