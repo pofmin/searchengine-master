@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import searchengine.config.Site;
 import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
-import searchengine.exception_handing.indexing.IndexingInProgressException;
-import searchengine.exception_handing.indexing.IndexingStatusException;
-import searchengine.exception_handing.indexing.PageCantBeIndexedException;
-import searchengine.exception_handing.indexing.PageOutsideConfigException;
+import searchengine.exception_handing.indexing.*;
 import searchengine.model.*;
 import searchengine.repository.IndexRepository;
 import searchengine.repository.LemmaRepository;
@@ -21,6 +18,7 @@ import searchengine.repository.PageRepository;
 import searchengine.repository.SiteRepository;
 import searchengine.utility.LemmaGetter;
 import searchengine.utility.UtilityClass;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
@@ -29,6 +27,7 @@ import java.util.concurrent.RecursiveAction;
 @Service
 public class IndexingServiceImpl implements IndexingService {
     private static final String EXCLUDE_REGEX = ".+(\\.pdf|\\.PDF|\\.png|\\.json|\\.css|\\.doc|\\.docx|\\.jpg|\\.JPG|\\.jpeg|\\.xlsx|\\.xls|\\.ppt|\\.xml|\\.php|\\.jfif|\\.eps|\\?|=).*";
+    private static final String URL_REGEX = "[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
     public static Map<String, Boolean> isRunning = new HashMap<>();
     private List<String> onePageIndexes = new ArrayList<>();
     private SitesList sitesList;
@@ -85,6 +84,9 @@ public class IndexingServiceImpl implements IndexingService {
 
     @Override
     public IndexingResponse indexPage(String url) {
+        if (!url.matches(URL_REGEX)) {
+            throw new InvalidUrlException();
+        }
         Site currentSite = UtilityClass.getCurrentSite(url, sitesList);
         if (currentSite == null) {
             throw new PageOutsideConfigException();
@@ -129,14 +131,15 @@ public class IndexingServiceImpl implements IndexingService {
     }
 
     public boolean savePage(PageEntity pageEntity) {
-        synchronized (LinkChecker.class) {
-            if (pageRepository.findByPathAndSiteEntity(pageEntity.getPath(), pageEntity.getSiteEntity()) == null) {
-                pageRepository.save(pageEntity);
-                return true;
-            } else {
-                return false;
+        if (pageRepository.findByPathAndSiteEntity(pageEntity.getPath(), pageEntity.getSiteEntity()) == null) {
+            synchronized (LinkChecker.class) {
+                if (pageRepository.findByPathAndSiteEntity(pageEntity.getPath(), pageEntity.getSiteEntity()) == null) {
+                    pageRepository.save(pageEntity);
+                    return true;
+                }
             }
         }
+        return false;
     }
 
     public LemmaEntity saveLemma(SiteEntity siteEntity, String lemma) {
@@ -152,7 +155,6 @@ public class IndexingServiceImpl implements IndexingService {
         }
     }
 
-
     private class OnePageIndexer extends Thread {
         private Site currentSite;
         private String url;
@@ -167,7 +169,7 @@ public class IndexingServiceImpl implements IndexingService {
             onePageIndexes.add(url);
             String cutURL = UtilityClass.getCutURL(currentSite.getUrl());
             SiteEntity siteEntity = siteRepository.findByUrl(cutURL);
-             if (siteEntity == null) {
+            if (siteEntity == null) {
                 siteEntity = new SiteEntity(Status.INDEXED, new Date(), cutURL, currentSite.getName());
                 siteRepository.save(siteEntity);
             }

@@ -49,4 +49,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<IndexingInProgress> handleIndexingInProgress(IndexingInProgressException exception) {
         return new ResponseEntity<>(new IndexingInProgress(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<InvalidUrl> handleInvalidUrl(InvalidUrlException exception) {
+        return new ResponseEntity<>(new InvalidUrl(), HttpStatus.BAD_REQUEST);
+    }
 }
