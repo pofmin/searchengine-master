@@ -75,6 +75,14 @@
 
 ![8 - Неуспешная индексация одной страницы](https://user-images.githubusercontent.com/107081331/235677617-74a139db-9e50-49c5-9c3a-2d4df90174ed.png)
 
+Если введен неверный формат URL, выводится соответствующая ошибка:
+
+![Wrong URL format](https://github.com/pofmin/searchengine-master/assets/107081331/24a01fa4-bd68-4e73-a81a-658459c83147)
+
+Индексация не производится, если введена ссылка на сайт, которого нет в конфигурационном файле:
+
+![Outside config](https://github.com/pofmin/searchengine-master/assets/107081331/925b76fa-f29b-4cd9-a4c8-4bb7c7b40c0e)
+
 Поиск производится на вкладке **'SEARCH'**. Искать можно как по всем проиндексированным сайтам:
 
 ![9 - Поиск по всем сайтам](https://user-images.githubusercontent.com/107081331/235677714-8eb59806-a34e-457f-a1fc-3f97d77c9b65.png)
