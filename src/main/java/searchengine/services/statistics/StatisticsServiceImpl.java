@@ -1,30 +1,23 @@
-package searchengine.services;
+package searchengine.services.statistics;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import searchengine.config.SitesList;
 import searchengine.dto.statistics.*;
 import searchengine.model.SiteEntity;
 import searchengine.repository.LemmaRepository;
 import searchengine.repository.PageRepository;
 import searchengine.repository.SiteRepository;
+import searchengine.services.indexing.IndexingServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class StatisticsServiceImpl implements StatisticsService {
-    private SitesList sites;
-    private SiteRepository siteRepository;
-    private PageRepository pageRepository;
-    private LemmaRepository lemmaRepository;
 
-    @Autowired
-    public StatisticsServiceImpl(SitesList sites, SiteRepository siteRepository, PageRepository pageRepository, LemmaRepository lemmaRepository) {
-        this.sites = sites;
-        this.siteRepository = siteRepository;
-        this.pageRepository = pageRepository;
-        this.lemmaRepository = lemmaRepository;
-    }
+    private final SiteRepository siteRepository;
+    private final PageRepository pageRepository;
+    private final LemmaRepository lemmaRepository;
 
     @Override
     public StatisticsResponse getStatistics() {
@@ -58,12 +51,17 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     public DetailedStatisticsItem getItem(SiteEntity siteEntity) {
         if (siteEntity.getLastError() == null) {
-            DetailedStatisticsItemSuccess item = new DetailedStatisticsItemSuccess(siteEntity.getUrl(), siteEntity.getName());
-            return item;
+            return new DetailedStatisticsItem(
+                    siteEntity.getUrl(),
+                    siteEntity.getName(),
+                    ""
+            );
         } else {
-            DetailedStatisticsItemError item = new DetailedStatisticsItemError(siteEntity.getUrl(), siteEntity.getName());
-            item.setError(siteEntity.getLastError());
-            return item;
+            return new DetailedStatisticsItem(
+                    siteEntity.getUrl(),
+                    siteEntity.getName(),
+                    siteEntity.getLastError()
+            );
         }
     }
 }

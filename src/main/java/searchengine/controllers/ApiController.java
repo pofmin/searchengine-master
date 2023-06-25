@@ -1,14 +1,15 @@
 package searchengine.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import searchengine.dto.search.SearchRequestParams;
 import searchengine.dto.indexing.IndexingResponse;
 import searchengine.dto.search.SearchResponse;
 import searchengine.dto.statistics.StatisticsResponse;
-import searchengine.services.IndexingService;
-import searchengine.services.SearchService;
-import searchengine.services.StatisticsService;
+import searchengine.services.indexing.IndexingService;
+import searchengine.services.search.SearchService;
+import searchengine.services.statistics.StatisticsService;
 import searchengine.utility.UtilityClass;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -17,16 +18,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class ApiController {
     private final StatisticsService statisticsService;
     private final IndexingService indexingService;
     private final SearchService searchService;
-
-    public ApiController(StatisticsService statisticsService, IndexingService indexingService, SearchService searchService) {
-        this.statisticsService = statisticsService;
-        this.indexingService = indexingService;
-        this.searchService = searchService;
-    }
 
     @GetMapping("/statistics")
     public ResponseEntity<StatisticsResponse> statistics() {

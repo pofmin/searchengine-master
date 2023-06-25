@@ -23,10 +23,10 @@ indexing-settings:
   sites:
     - url: https://nikoartgallery.com/
       name: NIKO
-    - url: https://www.svetlovka.ru/
-      name: SVETLOVKA
-    - url: https://redcom.ru/
-      name: REDCOM
+#    - url: https://www.svetlovka.ru/
+#      name: SVETLOVKA
+#    - url: https://redcom.ru/
+#      name: REDCOM
   frequency-threshold: 0.5
   snippet-length-max: 30
 
